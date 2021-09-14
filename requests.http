@@ -1,0 +1,38 @@
+@base_url=http://localhost:8081/api/v1
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE2MTk4MzcsImlzcyI6Imdvb2dsZS5jb20ifQ.x4r1rLXRGg9zgec-6FBq4Cfe8oxirfAqPi-dG2bixDk
+
+###
+
+GET {{base_url}}/health-check HTTP/2.0
+content-type: application/json
+
+###
+
+POST {{base_url}}/login HTTP/2.0
+content-type: application/json
+
+{
+	"email": "mihai@gmail.com",
+	"password": "intrex"
+}
+
+###
+
+POST {{base_url}}/register HTTP/2.0
+content-type: application/json
+
+{
+	"first_name": "Mihai",
+	"last_name": "Blebea",
+    "email": "mihai@gmail.com",
+	"password": "intrex"
+}
+
+###
+
+POST {{base_url}}/authorize HTTP/2.0
+content-type: application/json
+
+{
+	"token": "{{token}}"
+}
