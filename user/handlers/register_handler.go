@@ -16,10 +16,11 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	ID      int    `json:"id,omitempty"`
-	Token   string `json:"token"`
-	Success bool   `json:"success"`
-	Message string `json:"message,omitempty"`
+	ID           int    `json:"id,omitempty"`
+	AccessToken  string `json:"access_token,omitempty"`
+	RefreshToken string `json:"refresh_token,omitempty"`
+	Success      bool   `json:"success"`
+	Message      string `json:"message,omitempty"`
 }
 
 func RegisterHandler(s user.Service) http.Handler {
@@ -74,7 +75,8 @@ func RegisterHandler(s user.Service) http.Handler {
 
 		response.Success = true
 		response.ID = user.ID
-		response.Token = user.Token
+		response.AccessToken = user.AccessToken
+		response.RefreshToken = user.RefreshToken
 
 		sendResponse(w, response, http.StatusOK)
 	})

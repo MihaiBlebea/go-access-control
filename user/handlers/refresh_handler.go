@@ -8,35 +8,36 @@ import (
 	"github.com/MihaiBlebea/go-access-control/user"
 )
 
-type AuthorizeRequest struct {
-	AccessToken string `json:"access_token"`
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token"`
 }
 
-type AuthorizeResponse struct {
-	ID      int          `json:"id,omitempty"`
-	User    *UserDetails `json:"user,omitempty"`
-	Success bool         `json:"success"`
-	Message string       `json:"message,omitempty"`
+type RefreshResponse struct {
+	ID          int          `json:"id,omitempty"`
+	AccessToken string       `json:"access_token,omitempty"`
+	User        *UserDetails `json:"user,omitempty"`
+	Success     bool         `json:"success"`
+	Message     string       `json:"message,omitempty"`
 }
 
-func AuthorizeHandler(s user.Service) http.Handler {
-	validate := func(r *http.Request) (*AuthorizeRequest, error) {
-		request := AuthorizeRequest{}
+func RefreshHandler(s user.Service) http.Handler {
+	validate := func(r *http.Request) (*RefreshRequest, error) {
+		request := RefreshRequest{}
 
 		err := json.NewDecoder(r.Body).Decode(&request)
 		if err != nil {
 			return &request, err
 		}
 
-		if request.AccessToken == "" {
-			return &request, errors.New("invalid request param access_token")
+		if request.RefreshToken == "" {
+			return &request, errors.New("invalid request param refresh_token")
 		}
 
 		return &request, nil
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		response := AuthorizeResponse{}
+		response := RefreshResponse{}
 
 		request, err := validate(r)
 		if err != nil {
@@ -45,7 +46,7 @@ func AuthorizeHandler(s user.Service) http.Handler {
 			return
 		}
 
-		user, err := s.Authorize(request.AccessToken)
+		user, err := s.RefreshToken(request.RefreshToken)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest)
@@ -54,6 +55,7 @@ func AuthorizeHandler(s user.Service) http.Handler {
 
 		response.Success = true
 		response.ID = user.ID
+		response.AccessToken = user.AccessToken
 		response.User = toUserDetails(user)
 
 		sendResponse(w, response, http.StatusOK)

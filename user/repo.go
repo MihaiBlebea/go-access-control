@@ -19,9 +19,23 @@ func NewRepo(conn *gorm.DB) *UserRepo {
 	return &UserRepo{conn}
 }
 
-func (r *UserRepo) userWithToken(token string) (*User, error) {
+func (r *UserRepo) userWithAccessToken(token string) (*User, error) {
 	user := User{}
-	err := r.conn.Where("token = ?", token).Find(&user).Error
+	err := r.conn.Where("access_token = ?", token).Find(&user).Error
+	if err != nil {
+		return &user, err
+	}
+
+	if user.ID == 0 {
+		return &user, ErrNoRecord
+	}
+
+	return &user, nil
+}
+
+func (r *UserRepo) userWithRefreshToken(token string) (*User, error) {
+	user := User{}
+	err := r.conn.Where("refresh_token = ?", token).Find(&user).Error
 	if err != nil {
 		return &user, err
 	}

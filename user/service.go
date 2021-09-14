@@ -10,6 +10,7 @@ type Service interface {
 	Register(firstName, lastName, email, password string) (*User, error)
 	Login(email, password string) (*User, error)
 	Authorize(token string) (*User, error)
+	RefreshToken(token string) (*User, error)
 }
 
 func NewService(userRepo *UserRepo) Service {
@@ -26,7 +27,11 @@ func (s *service) Register(firstName, lastName, email, password string) (*User, 
 		return &User{}, err
 	}
 
-	if err := s.createOrUpdateUserToken(u); err != nil {
+	if err := s.updateAccessToken(u); err != nil {
+		return &User{}, err
+	}
+
+	if err := s.userRepo.update(u); err != nil {
 		return &User{}, err
 	}
 
@@ -43,7 +48,15 @@ func (s *service) Login(email, password string) (*User, error) {
 		return &User{}, errors.New("password or email is invalid")
 	}
 
-	if err := s.createOrUpdateUserToken(u); err != nil {
+	if err := s.updateAccessToken(u); err != nil {
+		return &User{}, err
+	}
+
+	if err := s.updateRefreshToken(u); err != nil {
+		return &User{}, err
+	}
+
+	if err := s.userRepo.update(u); err != nil {
 		return &User{}, err
 	}
 
@@ -51,21 +64,51 @@ func (s *service) Login(email, password string) (*User, error) {
 }
 
 func (s *service) Authorize(token string) (*User, error) {
-	u, err := s.userRepo.userWithToken(token)
+	u, err := s.userRepo.userWithAccessToken(token)
 	if err != nil {
 		return &User{}, err
 	}
 
-	_, err = u.ValidateToken(token)
+	ok, err := u.validateAccessToken(token)
 	if err != nil {
+		return &User{}, err
+	}
+
+	if !ok {
+		return &User{}, errors.New("user access_token is invalid")
+	}
+
+	return u, nil
+}
+
+func (s *service) RefreshToken(token string) (*User, error) {
+	u, err := s.userRepo.userWithRefreshToken(token)
+	if err != nil {
+		return &User{}, err
+	}
+
+	ok, err := u.validateRefreshToken(token)
+	if err != nil {
+		return &User{}, err
+	}
+
+	if !ok {
+		return &User{}, errors.New("user refresh token is invalid")
+	}
+
+	if err := s.updateAccessToken(u); err != nil {
+		return &User{}, err
+	}
+
+	if err := s.userRepo.update(u); err != nil {
 		return &User{}, err
 	}
 
 	return u, nil
 }
 
-func (s *service) createOrUpdateUserToken(u *User) error {
-	token, err := u.GenerateToken()
+func (s *service) updateAccessToken(u *User) error {
+	token, err := u.generateAccessToken()
 	if err != nil {
 		return err
 	}
@@ -73,11 +116,21 @@ func (s *service) createOrUpdateUserToken(u *User) error {
 		return errors.New("token cannot be an empty string")
 	}
 
-	u.Token = token
+	u.AccessToken = token
 
-	if err := s.userRepo.update(u); err != nil {
+	return nil
+}
+
+func (s *service) updateRefreshToken(u *User) error {
+	token, err := u.generateRefreshToken()
+	if err != nil {
 		return err
 	}
+	if token == "" {
+		return errors.New("token cannot be an empty string")
+	}
+
+	u.RefreshToken = token
 
 	return nil
 }

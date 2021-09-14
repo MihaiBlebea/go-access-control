@@ -1,5 +1,7 @@
 @base_url=http://localhost:8081/api/v1
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE2MTk4MzcsImlzcyI6Imdvb2dsZS5jb20ifQ.x4r1rLXRGg9zgec-6FBq4Cfe8oxirfAqPi-dG2bixDk
+@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE2MjYwNzMsImlzcyI6Imdvb2dsZS5jb20ifQ.VecxT5D_QsrgMt1PbRTruL7cxaXTPp_LMNXTz7eaP0Y
+
+@refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzg4ODMwNTUsImlzcyI6Imdvb2dsZS5jb20ifQ.KGwNAlPJG-BAZcaXzktN935Az9ZSdTGCdw1O6q0CRvc
 
 ###
 
@@ -34,5 +36,15 @@ POST {{base_url}}/authorize HTTP/2.0
 content-type: application/json
 
 {
-	"token": "{{token}}"
+	"access_token": "{{access_token}}"
+}
+
+###
+
+
+POST {{base_url}}/refresh HTTP/2.0
+content-type: application/json
+
+{
+	"refresh_token": "{{refresh_token}}"
 }

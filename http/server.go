@@ -36,6 +36,9 @@ func New(userService user.Service, logger *logrus.Logger) {
 	api.Handle("/authorize", uhandlers.AuthorizeHandler(userService)).
 		Methods(http.MethodPost)
 
+	api.Handle("/refresh", uhandlers.RefreshHandler(userService)).
+		Methods(http.MethodPost)
+
 	r.Use(loggerMiddleware(logger))
 
 	srv := &http.Server{
