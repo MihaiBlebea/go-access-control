@@ -168,6 +168,11 @@ func (u *User) validatePasswordHash(password string) bool {
 	return err == nil
 }
 
+func (u *User) confirm() {
+	u.Confirmed = true
+	u.ConfirmToken = ""
+}
+
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 

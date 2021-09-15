@@ -149,8 +149,7 @@ func (s *service) ConfirmUser(confirmToken string) (*User, error) {
 		return &User{}, err
 	}
 
-	u.ConfirmToken = ""
-	u.Confirmed = true
+	u.confirm()
 
 	if err := s.userRepo.update(u); err != nil {
 		return &User{}, err
