@@ -1,10 +1,8 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/gorilla/context"
@@ -20,7 +18,7 @@ func loggerMiddleware(logger *logrus.Logger) func(next http.Handler) http.Handle
 	}
 }
 
-func projMiddleware(projectService proj.Service, logger *logrus.Logger) func(next http.Handler) http.Handler {
+func getProjectID(projectService proj.Service, logger *logrus.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -31,44 +29,16 @@ func projMiddleware(projectService proj.Service, logger *logrus.Logger) func(nex
 				return
 			}
 
-			id, err := projectService.GetProjectID(token)
+			project, err := projectService.GetProject(token)
 			if err != nil {
 				logger.Info(fmt.Sprintf("Error %s request %s: %s", r.Method, r.URL.Path, err.Error()))
 				unauthorizedResponse(w)
 				return
 			}
 
-			context.Set(r, "project_id", id)
+			context.Set(r, "project_id", project.ID)
 
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-func extractToken(r *http.Request) (string, error) {
-	reqToken := r.Header.Get("Authorization")
-	if reqToken == "" {
-		return "", errors.New("bearer token is invalid")
-	}
-
-	splitToken := strings.Split(reqToken, "Bearer ")
-	if len(splitToken) < 2 {
-		return "", errors.New("bearer token is invalid")
-	}
-
-	reqToken = splitToken[1]
-
-	if reqToken == "" {
-		return "", errors.New("bearer token is invalid")
-	}
-
-	return reqToken, nil
-}
-
-func unauthorizedResponse(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(401)
-
-	w.Write([]byte{})
 }

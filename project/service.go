@@ -3,7 +3,7 @@ package proj
 type Service interface {
 	CreateProject(name, host string) (*Project, error)
 	RegenApiKey(apiKey string) (*Project, error)
-	GetProjectID(apiKey string) (int, error)
+	GetProject(apiKey string) (*Project, error)
 }
 
 type service struct {
@@ -15,6 +15,7 @@ func NewService(projecRepo *ProjectRepo) Service {
 }
 
 func (s *service) CreateProject(name, host string) (*Project, error) {
+
 	p := New(name, host)
 
 	if err := s.projecRepo.store(p); err != nil {
@@ -39,11 +40,11 @@ func (s *service) RegenApiKey(apiKey string) (*Project, error) {
 	return p, nil
 }
 
-func (s *service) GetProjectID(apiKey string) (int, error) {
+func (s *service) GetProject(apiKey string) (*Project, error) {
 	p, err := s.projecRepo.projectWithApiKey(apiKey)
 	if err != nil {
-		return 0, err
+		return &Project{}, err
 	}
 
-	return p.ID, nil
+	return p, nil
 }

@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const apiKeyLength = 20
+
 type Project struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name" gorm:"unique"`
@@ -18,12 +20,12 @@ func New(name, host string) *Project {
 	return &Project{
 		Name:   name,
 		Host:   host,
-		ApiKey: genApiKey(10),
+		ApiKey: genApiKey(apiKeyLength),
 	}
 }
 
 func (p *Project) RegenApiKey() {
-	p.ApiKey = genApiKey(10)
+	p.ApiKey = genApiKey(apiKeyLength)
 }
 
 func genApiKey(n int) string {

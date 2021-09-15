@@ -4,7 +4,9 @@
 	<body>
 		<h1>This is a confirmation email for you {{ .Name }}</h1>
 		{{ .Message }}
+		<hr />
 
-		Please click this link to confirm your email: {{ .ConfirmLink }}
+		<p>Please click this link to confirm your email:</p>
+		<a href="{{ .ConfirmLink }}">{{ .ConfirmLink }}</a>
 	</body>
 </html>

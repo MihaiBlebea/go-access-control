@@ -12,12 +12,14 @@ type service struct {
 }
 
 type Service interface {
-	Register(projectID int, firstName, lastName, email, password string) (*User, error)
+	Register(
+		projectID int,
+		firstName, lastName, email, password, successURL, failURL, webhook string) (*User, error)
 	Login(email, password string) (*User, error)
 	Authorize(projectID int, token string) (*User, error)
 	RefreshToken(token string) (*User, error)
 	RemoveUser(projectID int, token string) (int, error)
-	ConfirmUser(confirmToken string) (*User, error)
+	ConfirmUser(confirmToken string) (*User, *confirmTokenClaims, error)
 }
 
 func NewService(userRepo *UserRepo, emailService email.Service) Service {
@@ -26,12 +28,19 @@ func NewService(userRepo *UserRepo, emailService email.Service) Service {
 
 func (s *service) Register(
 	projectID int,
-	firstName, lastName, email, password string) (*User, error) {
+	firstName, lastName, email, password, successURL, failURL, webhook string) (*User, error) {
 
 	u, err := New(projectID, firstName, lastName, email, password)
 	if err != nil {
 		return &User{}, err
 	}
+
+	confirmToken, err := generateConfirmToken(successURL, failURL, webhook)
+	if err != nil {
+		return &User{}, err
+	}
+
+	u.ConfirmToken = confirmToken
 
 	if err := s.userRepo.store(u); err != nil {
 		return &User{}, err
@@ -146,19 +155,24 @@ func (s *service) RemoveUser(projectID int, token string) (int, error) {
 	return u.ID, nil
 }
 
-func (s *service) ConfirmUser(confirmToken string) (*User, error) {
+func (s *service) ConfirmUser(confirmToken string) (*User, *confirmTokenClaims, error) {
+	claims, err := parseConfirmToken(confirmToken)
+	if err != nil {
+		return &User{}, &confirmTokenClaims{}, err
+	}
+
 	u, err := s.userRepo.userWithConfirmToken(confirmToken)
 	if err != nil {
-		return &User{}, err
+		return &User{}, &confirmTokenClaims{}, err
 	}
 
 	u.confirm()
 
 	if err := s.userRepo.update(u); err != nil {
-		return &User{}, err
+		return &User{}, &confirmTokenClaims{}, err
 	}
 
-	return u, nil
+	return u, claims, nil
 }
 
 func (s *service) updateAccessToken(u *User) error {

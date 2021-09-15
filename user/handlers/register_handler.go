@@ -10,10 +10,13 @@ import (
 )
 
 type RegisterRequest struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	FirstName         string `json:"first_name"`
+	LastName          string `json:"last_name"`
+	Email             string `json:"email"`
+	Password          string `json:"password"`
+	ConfirmSuccessURL string `json:"confirm_success_url"`
+	ConfirmFailURL    string `json:"confirm_fail_url"`
+	ConfirmWebhook    string `json:"confirm_webhook"`
 }
 
 type RegisterResponse struct {
@@ -70,6 +73,9 @@ func RegisterHandler(s user.Service) http.Handler {
 			request.LastName,
 			request.Email,
 			request.Password,
+			request.ConfirmSuccessURL,
+			request.ConfirmFailURL,
+			request.ConfirmWebhook,
 		)
 		if err != nil {
 			response.Message = err.Error()

@@ -32,10 +32,6 @@ func ProjectHandler(s Service) http.Handler {
 			return &request, errors.New("invalid request param name")
 		}
 
-		// if request.Host == "" {
-		// 	return &request, errors.New("invalid request param password")
-		// }
-
 		return &request, nil
 	}
 
@@ -49,7 +45,10 @@ func ProjectHandler(s Service) http.Handler {
 			return
 		}
 
-		p, err := s.CreateProject(request.Name, request.Host)
+		p, err := s.CreateProject(
+			request.Name,
+			request.Host,
+		)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest)

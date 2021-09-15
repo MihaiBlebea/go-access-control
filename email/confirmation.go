@@ -66,7 +66,7 @@ func (s *service) ConfirmEmail(email, confirmToken string) error {
 	}{
 		Name:        "Puneet Singh",
 		Message:     "This is a test message in a HTML template",
-		ConfirmLink: confirmToken,
+		ConfirmLink: fmt.Sprintf("%s?token=%s", os.Getenv("URL"), confirmToken),
 	}); err != nil {
 		return err
 	}

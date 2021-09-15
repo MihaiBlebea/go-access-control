@@ -46,15 +46,16 @@ func New(userService user.Service, projService proj.Service, logger *logrus.Logg
 	userApi.Handle("/remove", uhandlers.RemoveHandler(userService)).
 		Methods(http.MethodDelete)
 
-	userApi.Handle("/confirm", uhandlers.ConfirmHandler(userService)).
-		Methods(http.MethodPost)
+	r.Handle("/confirm", uhandlers.ConfirmHandler(userService)).
+		Methods(http.MethodGet)
 
 	// project endpoints
 	api.Handle("/project", proj.ProjectHandler(projService)).
 		Methods(http.MethodPost)
 
 	r.Use(loggerMiddleware(logger))
-	userApi.Use(projMiddleware(projService, logger))
+
+	userApi.Use(getProjectID(projService, logger))
 
 	srv := &http.Server{
 		Handler:      cors.AllowAll().Handler(r),

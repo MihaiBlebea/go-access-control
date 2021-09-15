@@ -1,11 +1,11 @@
 @base_url=http://localhost:8081/api/v1
-@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE3MDY1MDMsImlzcyI6Imdvb2dsZS5jb20ifQ.KMA-6QAtYoajTK0wZJf_yUOCXs1vfzDcLGpVzAC6hL4
+@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE3MjU3NDAsImlzcyI6Imdvb2dsZS5jb20ifQ.BtJiKLJZgxP0R3rG7IYFWesAUfdb-l6ujvgygVGlgio
 
-@refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzg5NTczMTIsImlzcyI6Imdvb2dsZS5jb20ifQ.fW2YiYPJcQOaZ8uvTqpV1mRv50mgCM7VUdroBT-t1gc
+@refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzg5ODMxNjAsImlzcyI6Imdvb2dsZS5jb20ifQ.Qt2hmUdsD5NCV5Gyljsok4MyDnXoPtzow-88y5_tFxw
 
 @confirm_token=0P7KU0mzNn
 
-@api_key=xpmKMJE7Ni
+@api_key=n1Ds04HSFhSOBJ4p6hDR
 
 ###
 
@@ -33,7 +33,9 @@ Authorization: Bearer {{api_key}}
 	"first_name": "Mihai",
 	"last_name": "Blebea",
     "email": "mihai@gmail.com",
-	"password": "intrex"
+	"password": "intrex",
+	"confirm_success_url": "https://www.google.com",
+	"confirm_fail_url": "https://www.fengshuiarmoie.ro"
 }
 
 ###
