@@ -12,11 +12,11 @@ type service struct {
 }
 
 type Service interface {
-	Register(firstName, lastName, email, password string) (*User, error)
+	Register(projectID int, firstName, lastName, email, password string) (*User, error)
 	Login(email, password string) (*User, error)
-	Authorize(token string) (*User, error)
+	Authorize(projectID int, token string) (*User, error)
 	RefreshToken(token string) (*User, error)
-	RemoveUser(token string) (int, error)
+	RemoveUser(projectID int, token string) (int, error)
 	ConfirmUser(confirmToken string) (*User, error)
 }
 
@@ -24,8 +24,11 @@ func NewService(userRepo *UserRepo, emailService email.Service) Service {
 	return &service{userRepo, emailService}
 }
 
-func (s *service) Register(firstName, lastName, email, password string) (*User, error) {
-	u, err := New(firstName, lastName, email, password)
+func (s *service) Register(
+	projectID int,
+	firstName, lastName, email, password string) (*User, error) {
+
+	u, err := New(projectID, firstName, lastName, email, password)
 	if err != nil {
 		return &User{}, err
 	}
@@ -78,7 +81,7 @@ func (s *service) Login(email, password string) (*User, error) {
 	return u, nil
 }
 
-func (s *service) Authorize(token string) (*User, error) {
+func (s *service) Authorize(projectID int, token string) (*User, error) {
 	u, err := s.userRepo.userWithAccessToken(token)
 	if err != nil {
 		return &User{}, err
@@ -130,8 +133,8 @@ func (s *service) RefreshToken(token string) (*User, error) {
 	return u, nil
 }
 
-func (s *service) RemoveUser(token string) (int, error) {
-	u, err := s.Authorize(token)
+func (s *service) RemoveUser(projectID int, token string) (int, error) {
+	u, err := s.Authorize(projectID, token)
 	if err != nil {
 		return 0, err
 	}

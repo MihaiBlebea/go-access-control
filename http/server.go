@@ -12,40 +12,49 @@ import (
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 
+	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/MihaiBlebea/go-access-control/user"
 	uhandlers "github.com/MihaiBlebea/go-access-control/user/handlers"
 )
 
 const prefix = "/api/v1/"
 
-func New(userService user.Service, logger *logrus.Logger) {
+func New(userService user.Service, projService proj.Service, logger *logrus.Logger) {
 	r := mux.NewRouter()
 
 	api := r.PathPrefix(prefix).Subrouter()
+
+	userApi := api.PathPrefix("/user/").Subrouter()
 
 	// Handle api calls
 	api.Handle("/health-check", healthHandler()).
 		Methods(http.MethodGet)
 
-	api.Handle("/login", uhandlers.LoginHandler(userService)).
+	// user endpoints
+	userApi.Handle("/login", uhandlers.LoginHandler(userService)).
 		Methods(http.MethodPost)
 
-	api.Handle("/register", uhandlers.RegisterHandler(userService)).
+	userApi.Handle("/register", uhandlers.RegisterHandler(userService)).
 		Methods(http.MethodPost)
 
-	api.Handle("/authorize", uhandlers.AuthorizeHandler(userService)).
+	userApi.Handle("/authorize", uhandlers.AuthorizeHandler(userService)).
 		Methods(http.MethodPost)
 
-	api.Handle("/refresh", uhandlers.RefreshHandler(userService)).
+	userApi.Handle("/refresh", uhandlers.RefreshHandler(userService)).
 		Methods(http.MethodPost)
 
-	api.Handle("/remove", uhandlers.RemoveHandler(userService)).
+	userApi.Handle("/remove", uhandlers.RemoveHandler(userService)).
 		Methods(http.MethodDelete)
 
-	api.Handle("/confirm", uhandlers.ConfirmHandler(userService)).
+	userApi.Handle("/confirm", uhandlers.ConfirmHandler(userService)).
+		Methods(http.MethodPost)
+
+	// project endpoints
+	api.Handle("/project", proj.ProjectHandler(projService)).
 		Methods(http.MethodPost)
 
 	r.Use(loggerMiddleware(logger))
+	userApi.Use(projMiddleware(projService, logger))
 
 	srv := &http.Server{
 		Handler:      cors.AllowAll().Handler(r),

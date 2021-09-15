@@ -5,6 +5,7 @@ import (
 
 	"github.com/MihaiBlebea/go-access-control/email"
 	"github.com/MihaiBlebea/go-access-control/http"
+	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/MihaiBlebea/go-access-control/user"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -39,16 +40,22 @@ var startCmd = &cobra.Command{
 			return err
 		}
 
-		if err := conn.AutoMigrate(&user.User{}); err != nil {
+		if err := conn.AutoMigrate(
+			&user.User{},
+			&proj.Project{},
+		); err != nil {
 			return err
 		}
+
+		pr := proj.NewRepo(conn)
+		ps := proj.NewService(pr)
 
 		es := email.New()
 
 		ur := user.NewRepo(conn)
 		us := user.NewService(ur, es)
 
-		http.New(us, l)
+		http.New(us, ps, l)
 
 		return nil
 	},

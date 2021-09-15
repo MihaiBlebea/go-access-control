@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/MihaiBlebea/go-access-control/user"
+	"github.com/gorilla/context"
 )
 
 type AuthorizeRequest struct {
@@ -45,7 +46,9 @@ func AuthorizeHandler(s user.Service) http.Handler {
 			return
 		}
 
-		user, err := s.Authorize(request.AccessToken)
+		projectID := context.Get(r, "project_id").(int)
+
+		user, err := s.Authorize(projectID, request.AccessToken)
 		if err != nil {
 			response.Message = err.Error()
 			sendResponse(w, response, http.StatusBadRequest)
