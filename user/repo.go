@@ -82,3 +82,7 @@ func (r *UserRepo) store(user *User) error {
 func (r *UserRepo) update(user *User) error {
 	return r.conn.Save(user).Error
 }
+
+func (r *UserRepo) delete(user *User) error {
+	return r.conn.Delete(user).Error
+}

@@ -11,6 +11,7 @@ type Service interface {
 	Login(email, password string) (*User, error)
 	Authorize(token string) (*User, error)
 	RefreshToken(token string) (*User, error)
+	RemoveUser(token string) (int, error)
 }
 
 func NewService(userRepo *UserRepo) Service {
@@ -105,6 +106,19 @@ func (s *service) RefreshToken(token string) (*User, error) {
 	}
 
 	return u, nil
+}
+
+func (s *service) RemoveUser(token string) (int, error) {
+	u, err := s.Authorize(token)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := s.userRepo.delete(u); err != nil {
+		return 0, err
+	}
+
+	return u.ID, nil
 }
 
 func (s *service) updateAccessToken(u *User) error {
