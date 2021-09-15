@@ -1,9 +1,11 @@
 @base_url=http://localhost:8081/api/v1
-@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE3MDA1NjAsImlzcyI6Imdvb2dsZS5jb20ifQ.hXy_TRLDCFUuzH5is9vEAu1s6E-JZiS1g882CP_Q-Ic
+@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE3MDY1MDMsImlzcyI6Imdvb2dsZS5jb20ifQ.KMA-6QAtYoajTK0wZJf_yUOCXs1vfzDcLGpVzAC6hL4
 
 @refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzg5NTczMTIsImlzcyI6Imdvb2dsZS5jb20ifQ.fW2YiYPJcQOaZ8uvTqpV1mRv50mgCM7VUdroBT-t1gc
 
-@confirm_token=BpLnfgDsc2
+@confirm_token=0P7KU0mzNn
+
+@api_key=xpmKMJE7Ni
 
 ###
 
@@ -12,8 +14,9 @@ content-type: application/json
 
 ###
 
-POST {{base_url}}/login HTTP/2.0
+POST {{base_url}}/user/login HTTP/2.0
 content-type: application/json
+Authorization: Bearer {{api_key}}
 
 {
 	"email": "mihai@gmail.com",
@@ -22,8 +25,9 @@ content-type: application/json
 
 ###
 
-POST {{base_url}}/register HTTP/2.0
+POST {{base_url}}/user/register HTTP/2.0
 content-type: application/json
+Authorization: Bearer {{api_key}}
 
 {
 	"first_name": "Mihai",
@@ -34,8 +38,9 @@ content-type: application/json
 
 ###
 
-POST {{base_url}}/authorize HTTP/2.0
+POST {{base_url}}/user/authorize HTTP/2.0
 content-type: application/json
+Authorization: Bearer {{api_key}}
 
 {
 	"access_token": "{{access_token}}"
@@ -44,8 +49,9 @@ content-type: application/json
 ###
 
 
-POST {{base_url}}/refresh HTTP/2.0
+POST {{base_url}}/user/refresh HTTP/2.0
 content-type: application/json
+Authorization: Bearer {{api_key}}
 
 {
 	"refresh_token": "{{refresh_token}}"
@@ -53,9 +59,20 @@ content-type: application/json
 
 ###
 
-POST {{base_url}}/confirm HTTP/2.0
+POST {{base_url}}/user/confirm HTTP/2.0
 content-type: application/json
+Authorization: Bearer {{api_key}}
 
 {
 	"confirm_token": "{{confirm_token}}"
+}
+
+###
+
+POST {{base_url}}/project HTTP/2.0
+content-type: application/json
+
+{
+	"name": "NiceProject",
+	"host": "nice-project.com"
 }

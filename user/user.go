@@ -12,6 +12,7 @@ import (
 
 type User struct {
 	ID           int       `json:"id"`
+	ProjectID    int       `json:"project_id"`
 	FirstName    string    `json:"first_name"`
 	LastName     string    `json:"last_name"`
 	Email        string    `json:"email" gorm:"unique"`
@@ -30,12 +31,13 @@ type customClaims struct {
 	jwt.StandardClaims
 }
 
-func New(firstName, lastName, email, password string) (*User, error) {
+func New(projectID int, firstName, lastName, email, password string) (*User, error) {
 	hash, err := hashPassword(password)
 	if err != nil {
 		return &User{}, err
 	}
 	u := User{
+		ProjectID: projectID,
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
@@ -181,6 +183,8 @@ func hashPassword(password string) (string, error) {
 
 func genConfirmationToken(n int) string {
 	letterBytes := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	rand.Seed(time.Now().UnixNano())
 
 	b := make([]byte, n)
 	for i := range b {

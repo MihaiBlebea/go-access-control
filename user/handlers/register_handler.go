@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/MihaiBlebea/go-access-control/user"
+	"github.com/gorilla/context"
 )
 
 type RegisterRequest struct {
@@ -61,7 +62,10 @@ func RegisterHandler(s user.Service) http.Handler {
 			return
 		}
 
+		projectID := context.Get(r, "project_id").(int)
+
 		user, err := s.Register(
+			projectID,
 			request.FirstName,
 			request.LastName,
 			request.Email,
