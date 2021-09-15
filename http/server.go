@@ -39,6 +39,9 @@ func New(userService user.Service, logger *logrus.Logger) {
 	api.Handle("/refresh", uhandlers.RefreshHandler(userService)).
 		Methods(http.MethodPost)
 
+	api.Handle("/remove", uhandlers.RemoveHandler(userService)).
+		Methods(http.MethodDelete)
+
 	r.Use(loggerMiddleware(logger))
 
 	srv := &http.Server{
