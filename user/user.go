@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"math/rand"
 	"os"
 	"time"
 
@@ -17,6 +18,8 @@ type User struct {
 	Password     string    `json:"password"`
 	AccessToken  string    `json:"access_token"`
 	RefreshToken string    `json:"refresh_token"`
+	Confirmed    bool      `json:"confirmed"`
+	ConfirmToken string    `json:"confirm_token"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
@@ -39,12 +42,16 @@ func New(firstName, lastName, email, password string) (*User, error) {
 		Password:  hash,
 	}
 
+	// generate refresh token with a long expiration date
 	refreshToken, err := u.generateRefreshToken()
 	if err != nil {
 		return &User{}, err
 	}
-
 	u.RefreshToken = refreshToken
+
+	// generate a short confirmation token that will be sent to the user
+	// to confirm his email
+	u.ConfirmToken = genConfirmationToken(10)
 
 	return &u, nil
 }
@@ -165,4 +172,15 @@ func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 
 	return string(bytes), err
+}
+
+func genConfirmationToken(n int) string {
+	letterBytes := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+
+	return string(b)
 }

@@ -1,3 +1,4 @@
 vendor
 data
 .env
+cmd/test.go

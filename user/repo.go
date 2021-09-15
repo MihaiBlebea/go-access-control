@@ -61,9 +61,9 @@ func (r *UserRepo) userWithEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func (r *UserRepo) userWithID(id int) (*User, error) {
+func (r *UserRepo) userWithConfirmToken(confirmToken string) (*User, error) {
 	user := User{}
-	err := r.conn.Where("id = ?", id).Find(&user).Error
+	err := r.conn.Where("confirm_token = ?", confirmToken).Find(&user).Error
 	if err != nil {
 		return &user, err
 	}
