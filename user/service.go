@@ -1,9 +1,14 @@
 package user
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/MihaiBlebea/go-access-control/email"
+)
 
 type service struct {
-	userRepo *UserRepo
+	userRepo     *UserRepo
+	emailService email.Service
 }
 
 type Service interface {
@@ -12,10 +17,11 @@ type Service interface {
 	Authorize(token string) (*User, error)
 	RefreshToken(token string) (*User, error)
 	RemoveUser(token string) (int, error)
+	ConfirmUser(confirmToken string) (*User, error)
 }
 
-func NewService(userRepo *UserRepo) Service {
-	return &service{userRepo}
+func NewService(userRepo *UserRepo, emailService email.Service) Service {
+	return &service{userRepo, emailService}
 }
 
 func (s *service) Register(firstName, lastName, email, password string) (*User, error) {
@@ -36,6 +42,10 @@ func (s *service) Register(firstName, lastName, email, password string) (*User, 
 		return &User{}, err
 	}
 
+	if err := s.emailService.ConfirmEmail(u.Email, u.ConfirmToken); err != nil {
+		return &User{}, err
+	}
+
 	return u, nil
 }
 
@@ -43,6 +53,10 @@ func (s *service) Login(email, password string) (*User, error) {
 	u, err := s.userRepo.userWithEmail(email)
 	if err != nil {
 		return &User{}, err
+	}
+
+	if !u.Confirmed {
+		return &User{}, errors.New("user is not confirmed")
 	}
 
 	if ok := u.validatePasswordHash(password); !ok {
@@ -70,6 +84,10 @@ func (s *service) Authorize(token string) (*User, error) {
 		return &User{}, err
 	}
 
+	if !u.Confirmed {
+		return &User{}, errors.New("user is not confirmed")
+	}
+
 	ok, err := u.validateAccessToken(token)
 	if err != nil {
 		return &User{}, err
@@ -86,6 +104,10 @@ func (s *service) RefreshToken(token string) (*User, error) {
 	u, err := s.userRepo.userWithRefreshToken(token)
 	if err != nil {
 		return &User{}, err
+	}
+
+	if !u.Confirmed {
+		return &User{}, errors.New("user is not confirmed")
 	}
 
 	ok, err := u.validateRefreshToken(token)
@@ -119,6 +141,22 @@ func (s *service) RemoveUser(token string) (int, error) {
 	}
 
 	return u.ID, nil
+}
+
+func (s *service) ConfirmUser(confirmToken string) (*User, error) {
+	u, err := s.userRepo.userWithConfirmToken(confirmToken)
+	if err != nil {
+		return &User{}, err
+	}
+
+	u.ConfirmToken = ""
+	u.Confirmed = true
+
+	if err := s.userRepo.update(u); err != nil {
+		return &User{}, err
+	}
+
+	return u, nil
 }
 
 func (s *service) updateAccessToken(u *User) error {

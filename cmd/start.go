@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/MihaiBlebea/go-access-control/email"
 	"github.com/MihaiBlebea/go-access-control/http"
 	"github.com/MihaiBlebea/go-access-control/user"
 	"github.com/sirupsen/logrus"
@@ -42,8 +43,10 @@ var startCmd = &cobra.Command{
 			return err
 		}
 
+		es := email.New()
+
 		ur := user.NewRepo(conn)
-		us := user.NewService(ur)
+		us := user.NewService(ur, es)
 
 		http.New(us, l)
 

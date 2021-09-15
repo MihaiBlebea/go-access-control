@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
-	"math/rand"
 	"net/smtp"
 	"os"
 	"strings"
@@ -15,7 +14,7 @@ import (
 var emailTmpl embed.FS
 
 type Service interface {
-	ConfirmEmail(email string) error
+	ConfirmEmail(email, confirmToken string) error
 }
 
 type service struct {
@@ -25,7 +24,7 @@ func New() Service {
 	return &service{}
 }
 
-func (s *service) ConfirmEmail(email string) error {
+func (s *service) ConfirmEmail(email, confirmToken string) error {
 	subject := "Please confirm your email"
 
 	// Sender data.
@@ -67,7 +66,7 @@ func (s *service) ConfirmEmail(email string) error {
 	}{
 		Name:        "Puneet Singh",
 		Message:     "This is a test message in a HTML template",
-		ConfirmLink: randomString(10),
+		ConfirmLink: confirmToken,
 	}); err != nil {
 		return err
 	}
@@ -79,14 +78,4 @@ func (s *service) ConfirmEmail(email string) error {
 	}
 
 	return nil
-}
-
-func randomString(n int) string {
-	letterBytes := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
 }

@@ -1,7 +1,9 @@
 @base_url=http://localhost:8081/api/v1
-@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE2MjYwNzMsImlzcyI6Imdvb2dsZS5jb20ifQ.VecxT5D_QsrgMt1PbRTruL7cxaXTPp_LMNXTz7eaP0Y
+@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJtaWhhaUBnbWFpbC5jb20iLCJleHAiOjE2MzE3MDA1NjAsImlzcyI6Imdvb2dsZS5jb20ifQ.hXy_TRLDCFUuzH5is9vEAu1s6E-JZiS1g882CP_Q-Ic
 
-@refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzg4ODMwNTUsImlzcyI6Imdvb2dsZS5jb20ifQ.KGwNAlPJG-BAZcaXzktN935Az9ZSdTGCdw1O6q0CRvc
+@refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Mzg5NTczMTIsImlzcyI6Imdvb2dsZS5jb20ifQ.fW2YiYPJcQOaZ8uvTqpV1mRv50mgCM7VUdroBT-t1gc
+
+@confirm_token=BpLnfgDsc2
 
 ###
 
@@ -47,4 +49,13 @@ content-type: application/json
 
 {
 	"refresh_token": "{{refresh_token}}"
+}
+
+###
+
+POST {{base_url}}/confirm HTTP/2.0
+content-type: application/json
+
+{
+	"confirm_token": "{{confirm_token}}"
 }
