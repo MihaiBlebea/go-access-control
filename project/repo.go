@@ -33,6 +33,20 @@ func (r *ProjectRepo) projectWithApiKey(apiKey string) (*Project, error) {
 	return &project, nil
 }
 
+func (r *ProjectRepo) projectWithSlug(slug string) (*Project, error) {
+	project := Project{}
+	err := r.conn.Where("slug = ?", slug).Find(&project).Error
+	if err != nil {
+		return &project, err
+	}
+
+	if project.ID == 0 {
+		return &project, ErrNoRecord
+	}
+
+	return &project, nil
+}
+
 func (r *ProjectRepo) store(user *Project) error {
 	return r.conn.Create(user).Error
 }

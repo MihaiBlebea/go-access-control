@@ -4,6 +4,7 @@ type Service interface {
 	CreateProject(name, host string) (*Project, error)
 	RegenApiKey(apiKey string) (*Project, error)
 	GetProject(apiKey string) (*Project, error)
+	GetProjectBySlug(slug string) (*Project, error)
 }
 
 type service struct {
@@ -42,6 +43,15 @@ func (s *service) RegenApiKey(apiKey string) (*Project, error) {
 
 func (s *service) GetProject(apiKey string) (*Project, error) {
 	p, err := s.projecRepo.projectWithApiKey(apiKey)
+	if err != nil {
+		return &Project{}, err
+	}
+
+	return p, nil
+}
+
+func (s *service) GetProjectBySlug(slug string) (*Project, error) {
+	p, err := s.projecRepo.projectWithSlug(slug)
 	if err != nil {
 		return &Project{}, err
 	}

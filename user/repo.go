@@ -75,6 +75,16 @@ func (r *UserRepo) userWithConfirmToken(confirmToken string) (*User, error) {
 	return &user, err
 }
 
+func (r *UserRepo) usersWithProjectID(projectID int) ([]User, error) {
+	users := []User{}
+	err := r.conn.Where("project_id = ?", projectID).Find(&users).Error
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
+}
+
 func (r *UserRepo) store(user *User) error {
 	return r.conn.Create(user).Error
 }

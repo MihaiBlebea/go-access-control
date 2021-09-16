@@ -20,6 +20,7 @@ type Service interface {
 	RefreshToken(token string) (*User, error)
 	RemoveUser(projectID int, token string) (int, error)
 	ConfirmUser(confirmToken string) (*User, *confirmTokenClaims, error)
+	ProjectUsers(projectID int) ([]User, error)
 }
 
 func NewService(userRepo *UserRepo, emailService email.Service) Service {
@@ -173,6 +174,10 @@ func (s *service) ConfirmUser(confirmToken string) (*User, *confirmTokenClaims, 
 	}
 
 	return u, claims, nil
+}
+
+func (s *service) ProjectUsers(projectID int) ([]User, error) {
+	return s.userRepo.usersWithProjectID(projectID)
 }
 
 func (s *service) updateAccessToken(u *User) error {

@@ -15,6 +15,7 @@ import (
 	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/MihaiBlebea/go-access-control/user"
 	uhandlers "github.com/MihaiBlebea/go-access-control/user/handlers"
+	"github.com/MihaiBlebea/go-access-control/webapp"
 )
 
 const prefix = "/api/v1/"
@@ -52,6 +53,10 @@ func New(userService user.Service, projService proj.Service, logger *logrus.Logg
 	// project endpoints
 	api.Handle("/project", proj.ProjectHandler(projService)).
 		Methods(http.MethodPost)
+
+	// webapp endpoints
+	r.Handle("/project/{slug}", webapp.ProjectGetHandler(projService, userService)).
+		Methods(http.MethodGet)
 
 	r.Use(loggerMiddleware(logger))
 
