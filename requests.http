@@ -5,7 +5,7 @@
 
 @confirm_token=0P7KU0mzNn
 
-@api_key=Qn78JQuq8IcxEKBve56y
+@api_key=aKrq3FC6wuOcRmCLV1EV
 
 ###
 
@@ -30,9 +30,9 @@ content-type: application/json
 Authorization: Bearer {{api_key}}
 
 {
-	"first_name": "Serban",
+	"first_name": "Mihai",
 	"last_name": "Blebea",
-    "email": "mihai2@gmail.com",
+    "email": "mihai@gmail.com",
 	"password": "intrex",
 	"confirm_success_url": "https://www.google.com",
 	"confirm_fail_url": "https://www.fengshuiarmoie.ro"

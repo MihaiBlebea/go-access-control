@@ -3,10 +3,11 @@ package uhandlers
 import (
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/user"
 )
 
-func ConfirmHandler(s user.Service) http.Handler {
+func ConfirmHandler(s user.Service, es event.Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 		if token == "" {
@@ -19,6 +20,8 @@ func ConfirmHandler(s user.Service) http.Handler {
 			redirect(w, r, claims.ConfirmFailURL)
 			return
 		}
+
+		es.StoreEvent(u.ID, "user:confirmed")
 
 		user.SendWebhook(claims.ConfirmWebhook, &user.Payload{Success: true, ID: u.ID})
 		redirect(w, r, claims.ConfirmSuccessURL)

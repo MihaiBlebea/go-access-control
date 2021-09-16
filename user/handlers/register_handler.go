@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/user"
 	"github.com/gorilla/context"
 )
@@ -27,7 +28,7 @@ type RegisterResponse struct {
 	Message      string `json:"message,omitempty"`
 }
 
-func RegisterHandler(s user.Service) http.Handler {
+func RegisterHandler(s user.Service, es event.Service) http.Handler {
 	validate := func(r *http.Request) (*RegisterRequest, error) {
 		request := RegisterRequest{}
 
@@ -82,6 +83,8 @@ func RegisterHandler(s user.Service) http.Handler {
 			sendResponse(w, response, http.StatusBadRequest)
 			return
 		}
+
+		es.StoreEvent(user.ID, "user:registered")
 
 		response.Success = true
 		response.ID = user.ID

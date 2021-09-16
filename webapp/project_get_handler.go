@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/MihaiBlebea/go-access-control/user"
 	"github.com/gorilla/mux"
@@ -16,9 +17,15 @@ type User struct {
 	Confirmed bool
 	CreatedAt string
 	HtmlID    string
+	Events    []Event
 }
 
-func ProjectGetHandler(ps proj.Service, us user.Service) http.Handler {
+type Event struct {
+	Action    string
+	CreatedAt string
+}
+
+func ProjectGetHandler(ps proj.Service, us user.Service, es event.Service) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		slug := params["slug"]
@@ -40,6 +47,21 @@ func ProjectGetHandler(ps proj.Service, us user.Service) http.Handler {
 
 		usrs := []User{}
 		for _, u := range users {
+
+			events, err := es.UserEvents(u.ID)
+			if err != nil {
+				renderError(w, 500, err)
+				return
+			}
+
+			evs := []Event{}
+			for _, e := range events {
+				evs = append(evs, Event{
+					Action:    e.Action,
+					CreatedAt: e.CreatedAt.String(),
+				})
+			}
+
 			usrs = append(usrs, User{
 				FirstName: u.FirstName,
 				LastName:  u.LastName,
@@ -47,6 +69,7 @@ func ProjectGetHandler(ps proj.Service, us user.Service) http.Handler {
 				Confirmed: u.Confirmed,
 				CreatedAt: u.CreatedAt.String(),
 				HtmlID:    getHtmlID(),
+				Events:    evs,
 			})
 		}
 

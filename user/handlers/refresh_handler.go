@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/user"
 )
 
@@ -20,7 +21,7 @@ type RefreshResponse struct {
 	Message     string       `json:"message,omitempty"`
 }
 
-func RefreshHandler(s user.Service) http.Handler {
+func RefreshHandler(s user.Service, es event.Service) http.Handler {
 	validate := func(r *http.Request) (*RefreshRequest, error) {
 		request := RefreshRequest{}
 
@@ -52,6 +53,8 @@ func RefreshHandler(s user.Service) http.Handler {
 			sendResponse(w, response, http.StatusBadRequest)
 			return
 		}
+
+		es.StoreEvent(user.ID, "user:token_refreshed")
 
 		response.Success = true
 		response.ID = user.ID

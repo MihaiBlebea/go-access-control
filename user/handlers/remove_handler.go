@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/user"
 	"github.com/gorilla/context"
 )
@@ -19,7 +20,7 @@ type RemoveResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-func RemoveHandler(s user.Service) http.Handler {
+func RemoveHandler(s user.Service, es event.Service) http.Handler {
 	validate := func(r *http.Request) (*RemoveRequest, error) {
 		request := RemoveRequest{}
 
@@ -53,6 +54,8 @@ func RemoveHandler(s user.Service) http.Handler {
 			sendResponse(w, response, http.StatusBadRequest)
 			return
 		}
+
+		es.StoreEvent(id, "user:removed")
 
 		response.Success = true
 		response.ID = id

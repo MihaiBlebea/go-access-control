@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/MihaiBlebea/go-access-control/email"
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/http"
 	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/MihaiBlebea/go-access-control/user"
@@ -43,9 +44,13 @@ var startCmd = &cobra.Command{
 		if err := conn.AutoMigrate(
 			&user.User{},
 			&proj.Project{},
+			&event.Event{},
 		); err != nil {
 			return err
 		}
+
+		er := event.NewRepo(conn)
+		eventS := event.NewService(er)
 
 		pr := proj.NewRepo(conn)
 		ps := proj.NewService(pr)
@@ -55,7 +60,7 @@ var startCmd = &cobra.Command{
 		ur := user.NewRepo(conn)
 		us := user.NewService(ur, es)
 
-		http.New(us, ps, l)
+		http.New(us, ps, eventS, l)
 
 		return nil
 	},

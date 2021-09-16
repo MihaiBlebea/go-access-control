@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/user"
 )
 
@@ -21,7 +22,7 @@ type LoginResponse struct {
 	Message      string `json:"message,omitempty"`
 }
 
-func LoginHandler(s user.Service) http.Handler {
+func LoginHandler(s user.Service, es event.Service) http.Handler {
 	validate := func(r *http.Request) (*LoginRequest, error) {
 		request := LoginRequest{}
 
@@ -57,6 +58,8 @@ func LoginHandler(s user.Service) http.Handler {
 			sendResponse(w, response, http.StatusBadRequest)
 			return
 		}
+
+		es.StoreEvent(user.ID, "user:loggedin")
 
 		response.Success = true
 		response.ID = user.ID

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	"github.com/MihaiBlebea/go-access-control/user"
 	"github.com/gorilla/context"
 )
@@ -20,7 +21,7 @@ type AuthorizeResponse struct {
 	Message string       `json:"message,omitempty"`
 }
 
-func AuthorizeHandler(s user.Service) http.Handler {
+func AuthorizeHandler(s user.Service, es event.Service) http.Handler {
 	validate := func(r *http.Request) (*AuthorizeRequest, error) {
 		request := AuthorizeRequest{}
 
@@ -54,6 +55,8 @@ func AuthorizeHandler(s user.Service) http.Handler {
 			sendResponse(w, response, http.StatusBadRequest)
 			return
 		}
+
+		es.StoreEvent(user.ID, "user:authorized")
 
 		response.Success = true
 		response.ID = user.ID

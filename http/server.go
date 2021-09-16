@@ -12,6 +12,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/MihaiBlebea/go-access-control/event"
 	proj "github.com/MihaiBlebea/go-access-control/project"
 	"github.com/MihaiBlebea/go-access-control/user"
 	uhandlers "github.com/MihaiBlebea/go-access-control/user/handlers"
@@ -20,7 +21,12 @@ import (
 
 const prefix = "/api/v1/"
 
-func New(userService user.Service, projService proj.Service, logger *logrus.Logger) {
+func New(
+	userService user.Service,
+	projService proj.Service,
+	eventService event.Service,
+	logger *logrus.Logger) {
+
 	r := mux.NewRouter()
 
 	api := r.PathPrefix(prefix).Subrouter()
@@ -32,22 +38,22 @@ func New(userService user.Service, projService proj.Service, logger *logrus.Logg
 		Methods(http.MethodGet)
 
 	// user endpoints
-	userApi.Handle("/login", uhandlers.LoginHandler(userService)).
+	userApi.Handle("/login", uhandlers.LoginHandler(userService, eventService)).
 		Methods(http.MethodPost)
 
-	userApi.Handle("/register", uhandlers.RegisterHandler(userService)).
+	userApi.Handle("/register", uhandlers.RegisterHandler(userService, eventService)).
 		Methods(http.MethodPost)
 
-	userApi.Handle("/authorize", uhandlers.AuthorizeHandler(userService)).
+	userApi.Handle("/authorize", uhandlers.AuthorizeHandler(userService, eventService)).
 		Methods(http.MethodPost)
 
-	userApi.Handle("/refresh", uhandlers.RefreshHandler(userService)).
+	userApi.Handle("/refresh", uhandlers.RefreshHandler(userService, eventService)).
 		Methods(http.MethodPost)
 
-	userApi.Handle("/remove", uhandlers.RemoveHandler(userService)).
+	userApi.Handle("/remove", uhandlers.RemoveHandler(userService, eventService)).
 		Methods(http.MethodDelete)
 
-	r.Handle("/confirm", uhandlers.ConfirmHandler(userService)).
+	r.Handle("/confirm", uhandlers.ConfirmHandler(userService, eventService)).
 		Methods(http.MethodGet)
 
 	// project endpoints
@@ -55,7 +61,7 @@ func New(userService user.Service, projService proj.Service, logger *logrus.Logg
 		Methods(http.MethodPost)
 
 	// webapp endpoints
-	r.Handle("/project/{slug}", webapp.ProjectGetHandler(projService, userService)).
+	r.Handle("/project/{slug}", webapp.ProjectGetHandler(projService, userService, eventService)).
 		Methods(http.MethodGet)
 
 	r.Use(loggerMiddleware(logger))

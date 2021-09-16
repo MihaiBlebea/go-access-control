@@ -53,7 +53,7 @@ func getHtmlID() string {
 	rand.Seed(time.Now().UnixNano())
 
 	b := make([]byte, 10)
-	for i, _ := range b {
+	for i := range b {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 
