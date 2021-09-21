@@ -74,13 +74,15 @@ func ProjectGetHandler(ps proj.Service, us user.Service, es event.Service) http.
 		}
 
 		data := struct {
-			ProjectName string
-			ApiKey      string
-			Users       []User
+			ProjectName   string
+			ProjectApiKey string
+			ApiKey        string
+			Users         []User
 		}{
-			ProjectName: project.Name,
-			ApiKey:      project.ApiKey,
-			Users:       usrs,
+			ProjectName:   project.Name,
+			ProjectApiKey: project.ApiKey,
+			ApiKey:        project.ApiKey,
+			Users:         usrs,
 		}
 
 		if err := render(w, "project", &data); err != nil {

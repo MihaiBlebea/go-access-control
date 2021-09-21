@@ -10,7 +10,8 @@
 		<div class="container my-5">
 			<div class="row">
 				<div class="col">
-					<h1 class="mb-3">Project {{ .ProjectName }}</h1>
+					<h1 class="mb-1">Project {{ .ProjectName }}</h1>
+					<h4 class="mb-3">API key: {{ .ProjectApiKey }}</h4>
 
 					<div class="accordion" id="accordionExample">
 						{{ range $user := .Users }}
