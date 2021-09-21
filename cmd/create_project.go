@@ -19,7 +19,7 @@ func init() {
 	rootCmd.AddCommand(createProjectCmd)
 
 	createProjectCmd.Flags().StringVarP(&projectName, "name", "n", "", "Project name")
-	createProjectCmd.Flags().StringVarP(&projectHost, "host", "h", "", "Project host")
+	createProjectCmd.Flags().StringVarP(&projectHost, "host", "o", "", "Project host")
 }
 
 var createProjectCmd = &cobra.Command{
