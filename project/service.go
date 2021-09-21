@@ -2,6 +2,7 @@ package proj
 
 type Service interface {
 	CreateProject(name, host string) (*Project, error)
+	RemoveProject(slug string) error
 	RegenApiKey(apiKey string) (*Project, error)
 	GetProject(apiKey string) (*Project, error)
 	GetProjectBySlug(slug string) (*Project, error)
@@ -16,7 +17,6 @@ func NewService(projecRepo *ProjectRepo) Service {
 }
 
 func (s *service) CreateProject(name, host string) (*Project, error) {
-
 	p := New(name, host)
 
 	if err := s.projecRepo.store(p); err != nil {
@@ -24,6 +24,19 @@ func (s *service) CreateProject(name, host string) (*Project, error) {
 	}
 
 	return p, nil
+}
+
+func (s *service) RemoveProject(slug string) error {
+	project, err := s.projecRepo.projectWithSlug(slug)
+	if err != nil {
+		return err
+	}
+
+	if err := s.projecRepo.delete(project); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *service) RegenApiKey(apiKey string) (*Project, error) {

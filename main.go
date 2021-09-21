@@ -1,17 +1,12 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/MihaiBlebea/go-access-control/cmd"
 	"github.com/joho/godotenv"
 )
 
 func init() {
-	err := godotenv.Load("./.env")
-	if err != nil {
-		fmt.Println(err)
-	}
+	godotenv.Load("./.env")
 }
 
 func main() {
